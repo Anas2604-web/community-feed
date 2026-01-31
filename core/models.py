@@ -64,6 +64,26 @@ class Like(models.Model):
             )
         ]
 
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+
+        if is_new:
+            from .models import KarmaTransaction
+
+            if self.post:
+                KarmaTransaction.objects.create(
+                    user=self.post.author,
+                    points=5
+                )
+
+            elif self.comment:
+                KarmaTransaction.objects.create(
+                    user=self.comment.author,
+                    points=1
+                )
+
+
 
 class KarmaTransaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
