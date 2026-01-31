@@ -63,3 +63,12 @@ class Like(models.Model):
                 name="unique_user_comment_like"
             )
         ]
+
+
+class KarmaTransaction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    points = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} earned {self.points} karma"
