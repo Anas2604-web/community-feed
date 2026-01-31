@@ -4,7 +4,10 @@ from django.utils.timezone import now
 from django.db.models import Sum, Count
 from django.http import JsonResponse
 
-from .models import KarmaTransaction, Post, Comment
+from django.views.decorators.http import require_POST
+from django.db import IntegrityError
+
+from .models import KarmaTransaction, Post, Comment, Like
 
 
 def leaderboard(request):
@@ -51,7 +54,6 @@ def feed(request):
     return JsonResponse(result, safe=False)
 
 
-
 def post_comments(request, post_id):
     comments = (
         Comment.objects
@@ -84,3 +86,25 @@ def post_comments(request, post_id):
         del data["parent_id"]
 
     return JsonResponse(roots, safe=False)
+
+
+@require_POST
+def like_post(request, post_id):
+    user = request.user
+
+    try:
+        Like.objects.create(user=user, post_id=post_id)
+        return JsonResponse({"status": "liked"})
+    except IntegrityError:
+        return JsonResponse({"status": "already liked"})
+
+
+@require_POST
+def like_comment(request, comment_id):
+    user = request.user
+
+    try:
+        Like.objects.create(user=user, comment_id=comment_id)
+        return JsonResponse({"status": "liked"})
+    except IntegrityError:
+        return JsonResponse({"status": "already liked"})
