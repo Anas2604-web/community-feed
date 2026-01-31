@@ -16,10 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from core.views import leaderboard
+from core.views import leaderboard, feed, post_comments
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("leaderboard/", leaderboard),
+    path("feed/", feed),
+    path("posts/<int:post_id>/comments/", post_comments),
+
+
 ]
 
