@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from core.views import leaderboard, feed, post_comments, like_post, like_comment
+from core.views import leaderboard, feed, post_comments, like_post, like_comment, like_post 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -25,6 +25,8 @@ urlpatterns = [
     path("posts/<int:post_id>/comments/", post_comments),
     path("like/post/<int:post_id>/", like_post),
     path("like/comment/<int:comment_id>/", like_comment),
+    path("posts/<int:post_id>/like/", like_post),
+    path("comments/<int:comment_id>/like/", like_comment),
 
 
 ]

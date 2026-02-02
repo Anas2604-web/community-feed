@@ -5,6 +5,8 @@ from django.db.models import Sum, Count
 from django.http import JsonResponse
 
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.models import User
 from django.db import IntegrityError
 
 from .models import KarmaTransaction, Post, Comment, Like
@@ -71,6 +73,7 @@ def post_comments(request, post_id):
             "author": comment.author.username,
             "content": comment.content,
             "created_at": comment.created_at,
+            "likes": comment.like_set.count(),
             "replies": [],
             "parent_id": comment.parent_id,
         }
@@ -105,6 +108,33 @@ def like_comment(request, comment_id):
 
     try:
         Like.objects.create(user=user, comment_id=comment_id)
+        return JsonResponse({"status": "liked"})
+    except IntegrityError:
+        return JsonResponse({"status": "already liked"})
+
+
+@csrf_exempt
+def like_post(request, post_id):
+    try:
+        user = User.objects.first()  
+        post = Post.objects.get(id=post_id)
+
+        Like.objects.create(user=user, post=post)
+
+        return JsonResponse({"status": "liked"})
+    except IntegrityError:
+        return JsonResponse({"status": "already liked"})
+
+
+
+@csrf_exempt
+def like_comment(request, comment_id):
+    try:
+        user = User.objects.first() 
+        comment = Comment.objects.get(id=comment_id)
+
+        Like.objects.create(user=user, comment=comment)
+
         return JsonResponse({"status": "liked"})
     except IntegrityError:
         return JsonResponse({"status": "already liked"})
